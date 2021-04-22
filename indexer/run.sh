@@ -14,9 +14,9 @@ set -eu
 
 echo "Downloading clangd indexer"
 
-python3 download_latest_release_assets.py --output-name clangd-indexing-tools.zip  --asset-prefix clangd-indexing-tools-linux
+python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip  --asset-prefix clangd_indexing_tools-linux
 
-unzip clangd-indexing-tools.zip
+unzip clangd_indexing_tools.zip
 
 export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
 
