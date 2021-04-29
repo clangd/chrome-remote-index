@@ -20,5 +20,5 @@ fi
 gcloud compute --project=$PROJECT_ID instance-templates \
   create-with-container $TEMPLATE_NAME --machine-type=$MACHINE_TYPE \
   --metadata=google-logging-enabled=true,google-monitoring-enabled=true \
-  --boot-disk-size=10GB --boot-disk-type=pd-standard \
+  --boot-disk-size=$DISK_SIZE --boot-disk-type=pd-standard \
   --tags=$BASE_INSTANCE_NAME --container-image=$FULL_IMAGE
