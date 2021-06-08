@@ -10,7 +10,7 @@
 #
 #===----------------------------------------------------------------------===//
 
-set -eu
+set -eux
 
 echo "Downloading clangd indexer"
 
@@ -38,15 +38,17 @@ export BUILD_DIR=$(readlink -f out/Build)
 
 DATE=$(date -u +%Y%m%d)
 
-# $1 is the directory where the build will live.
-# $2 is the platform name.
-# $3 is the date that will be put into the index filename.
+echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> ../.gclient
+
+gclient sync
+
+gclient runhooks
+
+# $1: directory where the build will live.
+# $2: the platform name.
+# $3: the date that will be put into the index filename.
 index() {
-  gclient sync -D
-
-  gclient runhooks
-
-  gn gen $1
+  echo "Indexing for $2"
 
   ninja -C $1 -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $1
 
@@ -64,12 +66,20 @@ index() {
 
 PLATFORM="linux"
 
-echo "Indexing for $PLATFORM"
-
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
+
+gn gen --args='target_os="linux"' $BUILD_DIR
+
+index $BUILD_DIR $PLATFORM $DATE
+
+# --- Linux Chromecast ---
+
+PLATFORM="linux-chromecast"
+
+gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
 
 index $BUILD_DIR $PLATFORM $DATE
 
@@ -77,11 +87,17 @@ index $BUILD_DIR $PLATFORM $DATE
 
 PLATFORM="android"
 
-echo "Indexing for $PLATFORM"
-
-echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
-
 build/install-build-deps-android.sh
+
+gn gen --args='target_os="android"' $BUILD_DIR
+
+index $BUILD_DIR $PLATFORM $DATE
+
+# --- Android Chromecast ---
+
+PLATFORM="android-chromecast"
+
+gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
 
 index $BUILD_DIR $PLATFORM $DATE
 
@@ -89,11 +105,7 @@ index $BUILD_DIR $PLATFORM $DATE
 
 PLATFORM="fuchsia"
 
-echo "Indexing for $PLATFORM"
-
-sed -i '$d' ../.gclient
-
-echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
+gn gen --args='target_os="fuchsia"'
 
 index $BUILD_DIR $PLATFORM $DATE
 
@@ -101,11 +113,7 @@ index $BUILD_DIR $PLATFORM $DATE
 
 PLATFORM="chromeos"
 
-echo "Indexing for $PLATFORM"
-
-sed -i '$d' ../.gclient
-
-echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
+gn gen --args='target_os="chromeos"' $BUILD_DIR
 
 index $BUILD_DIR $PLATFORM $DATE
 
@@ -115,6 +123,8 @@ CURRENT_COMMIT=$(git rev-parse --short HEAD)
 
 gh release create --repo clangd/chrome-remote-index --title="Index at $DATE" --notes="Index with at $CURRENT_COMMIT commit." $CURRENT_COMMIT \
   chrome-index-linux-$DATE.zip \
+  chrome-index-linuxcast-$DATE.zip \
   chrome-index-android-$DATE.zip \
+  chrome-index-chromecast-$DATE.zip \
   chrome-index-fuchsia-$DATE.zip \
   chrome-index-chromeos-$DATE.zip
