@@ -46,7 +46,7 @@ gclient runhooks
 
 # $1: the platform name.
 index() {
-  echo "Indexing for $2"
+  echo "Indexing for $1"
 
   ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
 
