@@ -44,22 +44,20 @@ gclient sync
 
 gclient runhooks
 
-# $1: directory where the build will live.
-# $2: the platform name.
-# $3: the date that will be put into the index filename.
+# $1: the platform name.
 index() {
   echo "Indexing for $2"
 
-  ninja -C $1 -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $1
+  ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
 
-  tools/clang/scripts/generate_compdb.py -p $1 > compile_commands.json
+  tools/clang/scripts/generate_compdb.py -p $BUILD_DIR > compile_commands.json
 
-  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$2.idx
+  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$1.idx
 
-  7z a chrome-index-$2-$3.zip /chrome-$2.idx
+  7z a chrome-index-$1-$DATE.zip /chrome-$1.idx
 
   # Clean up the build directory afterwards.
-  rm -rf $1
+  rm -rf $BUILD_DIR
 }
 
 # --- Linux ---
@@ -73,7 +71,7 @@ sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 
 gn gen --args='target_os="linux"' $BUILD_DIR
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # --- Linux Chromecast ---
 
@@ -81,7 +79,7 @@ PLATFORM="linux-chromecast"
 
 gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # --- Android ---
 
@@ -91,7 +89,7 @@ build/install-build-deps-android.sh
 
 gn gen --args='target_os="android"' $BUILD_DIR
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # --- Android Chromecast ---
 
@@ -99,7 +97,7 @@ PLATFORM="android-chromecast"
 
 gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # --- Fuchsia ---
 
@@ -107,7 +105,7 @@ PLATFORM="fuchsia"
 
 gn gen --args='target_os="fuchsia"'
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # --- ChromeOS ---
 
@@ -115,7 +113,7 @@ PLATFORM="chromeos"
 
 gn gen --args='target_os="chromeos"' $BUILD_DIR
 
-index $BUILD_DIR $PLATFORM $DATE
+index $PLATFORM
 
 # -- Finish the job ---
 
