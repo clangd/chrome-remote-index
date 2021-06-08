@@ -33,23 +33,88 @@ fetch --nohooks chromium
 
 cd src
 
+mkdir -p out/Build
+export BUILD_DIR=$(readlink -f out/Build)
+
+DATE=$(date -u +%Y%m%d)
+
+# $1 is the directory where the build will live.
+# $2 is the platform name.
+# $3 is the date that will be put into the index filename.
+index() {
+  gclient sync -D
+
+  gclient runhooks
+
+  gn gen $1
+
+  ninja -C $1 -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $1
+
+  tools/clang/scripts/generate_compdb.py -p $1 > compile_commands.json
+
+  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$2.idx
+
+  7z a chrome-index-$2-$3.zip /chrome-$2.idx
+
+  # Clean up the build directory afterwards.
+  rm -rf $1
+}
+
+# --- Linux ---
+
+PLATFORM="linux"
+
+echo "Indexing for $PLATFORM"
+
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-gclient runhooks
+index() $BUILD_DIR $PLATFORM $DATE
 
-gn gen out/Default
+# --- Android ---
 
-ninja -C out/Default/ -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C out/Default
+PLATFORM="android"
 
-tools/clang/scripts/generate_compdb.py -p out/Default > compile_commands.json
+echo "Indexing for $PLATFORM"
 
-$CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome.idx
+echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
 
-7z a chrome-index-$(date -u +%Y%m%d).zip /chrome.idx
+build/install-build-deps-android.sh
+
+index() $BUILD_DIR $PLATFORM $DATE
+
+# --- Fuchsia ---
+
+PLATFORM="fuchsia"
+
+echo "Indexing for $PLATFORM"
+
+sed -i '$d' ../.gclient
+
+echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
+
+index() $BUILD_DIR $PLATFORM $DATE
+
+# --- ChromeOS ---
+
+PLATFORM="chromeos"
+
+echo "Indexing for $PLATFORM"
+
+sed -i '$d' ../.gclient
+
+echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
+
+index() $BUILD_DIR $PLATFORM $DATE
+
+# -- Finish the job ---
 
 CURRENT_COMMIT=$(git rev-parse --short HEAD)
 
-gh release create --repo clangd/chrome-remote-index --title="Index at $(date -u +%Y-%m-%d)" --notes="Index with Default config options at $CURRENT_COMMIT commit." $CURRENT_COMMIT chrome-index-$(date -u +%Y%m%d).zip
+gh release create --repo clangd/chrome-remote-index --title="Index at $DATE" --notes="Index with at $CURRENT_COMMIT commit." $CURRENT_COMMIT \
+  chrome-index-linux-$DATE.zip \
+  chrome-index-android-$DATE.zip \
+  chrome-index-fuchsia-$DATE.zip \
+  chrome-index-chromeos-$DATE.zip
