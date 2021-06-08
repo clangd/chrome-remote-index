@@ -71,7 +71,7 @@ echo "Indexing for $PLATFORM"
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-index() "$BUILD_DIR" "$PLATFORM" "$DATE"
+index $BUILD_DIR $PLATFORM $DATE
 
 # --- Android ---
 
@@ -83,7 +83,7 @@ echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
 
 build/install-build-deps-android.sh
 
-index() "$BUILD_DIR" "$PLATFORM" "$DATE"
+index $BUILD_DIR $PLATFORM $DATE
 
 # --- Fuchsia ---
 
@@ -95,7 +95,7 @@ sed -i '$d' ../.gclient
 
 echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
 
-index() "$BUILD_DIR" "$PLATFORM" "$DATE"
+index $BUILD_DIR $PLATFORM $DATE
 
 # --- ChromeOS ---
 
@@ -107,7 +107,7 @@ sed -i '$d' ../.gclient
 
 echo "target_os = [ '$PLATFORM' ]" >> ../.gclient
 
-index() "$BUILD_DIR" "$PLATFORM" "$DATE"
+index $BUILD_DIR $PLATFORM $DATE
 
 # -- Finish the job ---
 
