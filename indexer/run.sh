@@ -75,11 +75,11 @@ index $PLATFORM
 
 # --- Linux Chromecast ---
 
-PLATFORM="linux-chromecast"
+# PLATFORM="linux-chromecast"
 
-gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
+# gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
 
-index $PLATFORM
+# index $PLATFORM
 
 # --- Android ---
 
@@ -103,7 +103,7 @@ index $PLATFORM
 
 PLATFORM="fuchsia"
 
-gn gen --args='target_os="fuchsia"'
+gn gen --args='target_os="fuchsia"' $BUILD_DIR
 
 index $PLATFORM
 
@@ -121,8 +121,8 @@ CURRENT_COMMIT=$(git rev-parse --short HEAD)
 
 gh release create --repo clangd/chrome-remote-index --title="Index at $DATE" --notes="Index with at $CURRENT_COMMIT commit." $CURRENT_COMMIT \
   chrome-index-linux-$DATE.zip \
-  chrome-index-linuxcast-$DATE.zip \
+  # chrome-index-linux-chromecast-$DATE.zip \
   chrome-index-android-$DATE.zip \
-  chrome-index-chromecast-$DATE.zip \
+  chrome-index-android-chromecast-$DATE.zip \
   chrome-index-fuchsia-$DATE.zip \
   chrome-index-chromeos-$DATE.zip
