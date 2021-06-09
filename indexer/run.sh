@@ -33,16 +33,24 @@ fetch --nohooks chromium
 
 cd src
 
-mkdir -p out/Build
-export BUILD_DIR=$(readlink -f out/Build)
-
-DATE=$(date -u +%Y%m%d)
+mkdir -p out/Default
+export BUILD_DIR=$(readlink -f out/Default)
 
 echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> ../.gclient
 
 gclient sync
 
 gclient runhooks
+
+# -- Create a release, will be empty for now.
+
+DATE=$(date -u +%Y%m%d)
+
+CURRENT_COMMIT=$(git rev-parse --short HEAD)
+
+gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
+  --title="Index at $DATE" \
+  --notes="Chromium index artifacts at $COMMIT with project root `$PWD`."
 
 # $1: the platform name.
 index() {
@@ -55,6 +63,8 @@ index() {
   $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$1.idx
 
   7z a chrome-index-$1-$DATE.zip /chrome-$1.idx
+
+  gh release upload $CURRENT_COMMIT chrome-index-$1-$DATE.zip
 
   # Clean up the build directory afterwards.
   rm -rf $BUILD_DIR
@@ -73,14 +83,6 @@ gn gen --args='target_os="linux"' $BUILD_DIR
 
 index $PLATFORM
 
-# --- Linux Chromecast ---
-
-# PLATFORM="linux-chromecast"
-
-# gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
-
-# index $PLATFORM
-
 # --- Android ---
 
 PLATFORM="android"
@@ -93,7 +95,7 @@ index $PLATFORM
 
 # --- Android Chromecast ---
 
-PLATFORM="android-chromecast"
+PLATFORM="chromecast-android"
 
 gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
 
@@ -115,14 +117,11 @@ gn gen --args='target_os="chromeos"' $BUILD_DIR
 
 index $PLATFORM
 
-# -- Finish the job ---
+# --- Linux Chromecast ---
 
-CURRENT_COMMIT=$(git rev-parse --short HEAD)
+PLATFORM="chromecast-linux"
 
-gh release create --repo clangd/chrome-remote-index --title="Index at $DATE" --notes="Index with at $CURRENT_COMMIT commit." $CURRENT_COMMIT \
-  chrome-index-linux-$DATE.zip \
-  # chrome-index-linux-chromecast-$DATE.zip \
-  chrome-index-android-$DATE.zip \
-  chrome-index-android-chromecast-$DATE.zip \
-  chrome-index-fuchsia-$DATE.zip \
-  chrome-index-chromeos-$DATE.zip
+gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
+
+index $PLATFORM
+
