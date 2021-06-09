@@ -50,11 +50,11 @@ gclient runhooks
 
 DATE=$(date -u +%Y%m%d)
 
-CURRENT_COMMIT=$(git rev-parse --short HEAD)
+COMMIT=$(git rev-parse --short HEAD)
 
-gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
+gh release create $COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
-  --notes="Chromium index artifacts at $CURRENT_COMMIT with project root `$PWD`."
+  --notes="Chromium index artifacts at $COMMIT with project root `$PWD`."
 
 # The indexing pipeline is common. Each platform will only have to do the
 # preparation step (set up the build configuration and install dependencies).
@@ -73,7 +73,7 @@ index() {
 
   7z a chrome-index-$1-$DATE.zip /chrome-$1.idx
 
-  gh release upload --repo clangd/chrome-remote-index $CURRENT_COMMIT chrome-index-$1-$DATE.zip
+  gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$1-$DATE.zip
 
   # Clean up the build directory afterwards.
   rm -rf $BUILD_DIR
