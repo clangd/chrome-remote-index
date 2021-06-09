@@ -12,6 +12,9 @@
 
 set -eux
 
+# Prepare the environment: download all necessary binaries and fetch the source
+# code.
+
 echo "Downloading clangd indexer"
 
 python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip  --asset-prefix clangd_indexing_tools-linux
@@ -52,6 +55,16 @@ CURRENT_COMMIT=$(git rev-parse --short HEAD)
 gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $CURRENT_COMMIT with project root `$PWD`."
+
+# This is an unfortunate hack. We need to unset the GitHub Token to login in
+# non-interactive mode.
+echo $GITHUB_TOKEN >> .github_token
+
+unset GITHUB_TOKEN
+
+gh auth login --with-token < .github_token
+
+export GITHUB_TOKEN=$(cat .github_token)
 
 # The indexing pipeline is common. Each platform will only have to do the
 # preparation step (set up the build configuration and install dependencies).
