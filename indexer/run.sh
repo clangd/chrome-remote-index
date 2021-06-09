@@ -42,7 +42,8 @@ gclient sync
 
 gclient runhooks
 
-# -- Create a release, will be empty for now.
+# Create a release, will be empty for now and incrementally populated
+# throughout the indexing pipeline.
 
 DATE=$(date -u +%Y%m%d)
 
@@ -52,12 +53,17 @@ gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $CURRENT_COMMIT with project root `$PWD`."
 
+# The indexing pipeline is common. Each platform will only have to do the
+# preparation step (set up the build configuration and install dependencies).
+
 # $1: the platform name.
 index() {
   echo "Indexing for $1"
 
+  # Build generated files.
   ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
 
+  # Get compile_commands.json for clangd-indexer.
   tools/clang/scripts/generate_compdb.py -p $BUILD_DIR > compile_commands.json
 
   $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$1.idx
