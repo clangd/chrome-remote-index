@@ -50,7 +50,7 @@ CURRENT_COMMIT=$(git rev-parse --short HEAD)
 
 gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
-  --notes="Chromium index artifacts at $COMMIT with project root `$PWD`."
+  --notes="Chromium index artifacts at $CURRENT_COMMIT with project root `$PWD`."
 
 # $1: the platform name.
 index() {
@@ -83,6 +83,14 @@ gn gen --args='target_os="linux"' $BUILD_DIR
 
 index $PLATFORM
 
+# --- ChromeOS ---
+
+PLATFORM="chromeos"
+
+gn gen --args='target_os="chromeos"' $BUILD_DIR
+
+index $PLATFORM
+
 # --- Android ---
 
 PLATFORM="android"
@@ -90,14 +98,6 @@ PLATFORM="android"
 build/install-build-deps-android.sh
 
 gn gen --args='target_os="android"' $BUILD_DIR
-
-index $PLATFORM
-
-# --- Android Chromecast ---
-
-PLATFORM="chromecast-android"
-
-gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
 
 index $PLATFORM
 
@@ -109,11 +109,11 @@ gn gen --args='target_os="fuchsia"' $BUILD_DIR
 
 index $PLATFORM
 
-# --- ChromeOS ---
+# --- Android Chromecast ---
 
-PLATFORM="chromeos"
+PLATFORM="chromecast-android"
 
-gn gen --args='target_os="chromeos"' $BUILD_DIR
+gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
 
 index $PLATFORM
 
@@ -124,4 +124,3 @@ PLATFORM="chromecast-linux"
 gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
 
 index $PLATFORM
-
