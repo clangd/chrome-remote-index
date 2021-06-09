@@ -56,16 +56,6 @@ gh release create $CURRENT_COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $CURRENT_COMMIT with project root `$PWD`."
 
-# This is an unfortunate hack. We need to unset the GitHub Token to login in
-# non-interactive mode.
-echo $GITHUB_TOKEN >> .github_token
-
-unset GITHUB_TOKEN
-
-gh auth login --with-token < .github_token
-
-export GITHUB_TOKEN=$(cat .github_token)
-
 # The indexing pipeline is common. Each platform will only have to do the
 # preparation step (set up the build configuration and install dependencies).
 
@@ -83,7 +73,7 @@ index() {
 
   7z a chrome-index-$1-$DATE.zip /chrome-$1.idx
 
-  gh release upload $CURRENT_COMMIT chrome-index-$1-$DATE.zip
+  gh release upload --repo clangd/chrome-remote-index $CURRENT_COMMIT chrome-index-$1-$DATE.zip
 
   # Clean up the build directory afterwards.
   rm -rf $BUILD_DIR
