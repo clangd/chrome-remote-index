@@ -56,12 +56,24 @@ gh release create $COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $COMMIT with project root \`$PWD\`."
 
+# Configurations for some build might fail but the indexing pipeline shouldn't
+# because some indices could still be produced.
+set +e
+
 # The indexing pipeline is common. Each platform will only have to do the
 # preparation step (set up the build configuration and install dependencies).
 
-# $1: the platform name.
+# $1: Platform name.
+# $2: GN arguments for the chosen platform.
+# TODO: Add logging for failures.
 index() {
-  echo "Indexing for $1"
+  PLATFORM=$1
+
+  GN_ARGS=$2
+
+  echo "Indexing for $PLATFORM"
+
+  gn gen --args=$GN_ARGS $BUILD_DIR
 
   # Build generated files.
   ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
@@ -69,11 +81,11 @@ index() {
   # Get compile_commands.json for clangd-indexer.
   tools/clang/scripts/generate_compdb.py -p $BUILD_DIR > compile_commands.json
 
-  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$1.idx
+  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$PLATFORM.idx
 
-  7z a chrome-index-$1-$DATE.zip /chrome-$1.idx
+  7z a chrome-index-$PLATFORM-$DATE.zip /chrome-$PLATFORM.idx
 
-  gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$1-$DATE.zip
+  gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$PLATFORM-$DATE.zip
 
   # Clean up the build directory afterwards.
   rm -rf $BUILD_DIR
@@ -81,55 +93,31 @@ index() {
 
 # --- Linux ---
 
-PLATFORM="linux"
-
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-gn gen --args='target_os="linux"' $BUILD_DIR
-
-index $PLATFORM
+index linux 'target_os="linux"'
 
 # --- ChromeOS ---
 
-PLATFORM="chromeos"
-
-gn gen --args='target_os="chromeos"' $BUILD_DIR
-
-index $PLATFORM
+index chromeos 'target_os="chromeos"'
 
 # --- Android ---
 
-PLATFORM="android"
-
 build/install-build-deps-android.sh
 
-gn gen --args='target_os="android"' $BUILD_DIR
-
-index $PLATFORM
+index android 'target_os="android"'
 
 # --- Fuchsia ---
 
-PLATFORM="fuchsia"
-
-gn gen --args='target_os="fuchsia"' $BUILD_DIR
-
-index $PLATFORM
+index fuchsia 'target_os="fuchsia"'
 
 # --- Android Chromecast ---
 
-PLATFORM="chromecast-android"
-
-gn gen --args='target_os="android" is_chromecast=true' $BUILD_DIR
-
-index $PLATFORM
+index chromecast-android 'target_os="android" is_chromecast=true'
 
 # --- Linux Chromecast ---
 
-PLATFORM="chromecast-linux"
-
-gn gen --args='target_os="linux" is_chromecast=true' $BUILD_DIR
-
-index $PLATFORM
+index chromecast-linux 'target_os="linux" is_chromecast=true'
