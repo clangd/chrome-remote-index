@@ -10,7 +10,10 @@
 #
 #===----------------------------------------------------------------------===//
 
-set -eu
+set -eux
+
+# Prepare the environment: download all necessary binaries and fetch the source
+# code.
 
 echo "Downloading clangd indexer"
 
@@ -33,23 +36,88 @@ fetch --nohooks chromium
 
 cd src
 
+mkdir -p out/Default
+export BUILD_DIR=$(readlink -f out/Default)
+
+echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> ../.gclient
+
+gclient sync
+
+gclient runhooks
+
+# Create a release, will be empty for now and incrementally populated
+# throughout the indexing pipeline.
+
+DATE=$(date -u +%Y%m%d)
+
+COMMIT=$(git rev-parse --short HEAD)
+
+gh release create $COMMIT --repo clangd/chrome-remote-index \
+  --title="Index at $DATE" \
+  --notes="Chromium index artifacts at $COMMIT with project root \`$PWD\`."
+
+# Configurations for some build might fail but the indexing pipeline shouldn't
+# because some indices could still be produced.
+set +e
+
+# The indexing pipeline is common. Each platform will only have to do the
+# preparation step (set up the build configuration and install dependencies).
+
+# $1: Platform name.
+# $2: GN arguments for the chosen platform.
+# TODO: Add logging for failures.
+index() {
+  PLATFORM=$1
+
+  GN_ARGS=$2
+
+  echo "Indexing for $PLATFORM"
+
+  gn gen --args=$GN_ARGS $BUILD_DIR
+
+  # Build generated files.
+  ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
+
+  # Get compile_commands.json for clangd-indexer.
+  tools/clang/scripts/generate_compdb.py -p $BUILD_DIR > compile_commands.json
+
+  $CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome-$PLATFORM.idx
+
+  7z a chrome-index-$PLATFORM-$DATE.zip /chrome-$PLATFORM.idx
+
+  gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$PLATFORM-$DATE.zip
+
+  # Clean up the build directory afterwards.
+  rm -rf $BUILD_DIR
+}
+
+# --- Linux ---
+
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-gclient runhooks
+index linux 'target_os="linux"'
 
-gn gen out/Default
+# --- ChromeOS ---
 
-ninja -C out/Default/ -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C out/Default
+index chromeos 'target_os="chromeos"'
 
-tools/clang/scripts/generate_compdb.py -p out/Default > compile_commands.json
+# --- Android ---
 
-$CLANGD_INDEXER --executor=all-TUs compile_commands.json > /chrome.idx
+build/install-build-deps-android.sh
 
-7z a chrome-index-$(date -u +%Y%m%d).zip /chrome.idx
+index android 'target_os="android"'
 
-CURRENT_COMMIT=$(git rev-parse --short HEAD)
+# --- Fuchsia ---
 
-gh release create --repo clangd/chrome-remote-index --title="Index at $(date -u +%Y-%m-%d)" --notes="Index with Default config options at $CURRENT_COMMIT commit." $CURRENT_COMMIT chrome-index-$(date -u +%Y%m%d).zip
+index fuchsia 'target_os="fuchsia"'
+
+# --- Android Chromecast ---
+
+index chromecast-android 'target_os="android" is_chromecast=true'
+
+# --- Linux Chromecast ---
+
+index chromecast-linux 'target_os="linux" is_chromecast=true'
