@@ -26,7 +26,7 @@ BASE_INSTANCE_NAME="${PROJECT_ID}-server"
 INDEX_REPO="clangd/chrome-remote-index"
 
 # Prefix of the index file in the github release artifacts.
-INDEX_ASSET_PREFIX="chrome-index"
+INDEX_ASSET_PREFIX="chrome-index-linux"
 
 # Absolute path to project root on indexer machine, passed to
 # clangd-index-server.
