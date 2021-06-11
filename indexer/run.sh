@@ -21,11 +21,6 @@ echo "Downloading clangd indexer"
 
 export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
 
-# Update the depot_tools.
-cd depot_tools
-git pull
-cd /
-
 export PATH="$PATH:$(readlink -f depot_tools)"
 
 # Update Chromium sources.
