@@ -19,33 +19,23 @@ cd /
 
 echo "Downloading clangd indexer"
 
-python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip  --asset-prefix clangd_indexing_tools-linux
-
-unzip clangd_indexing_tools.zip
-
 export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
 
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+# Update the depot_tools.
+cd depot_tools
+git pull
+cd /
 
 export PATH="$PATH:$(readlink -f depot_tools)"
 
-mkdir chromium
-cd chromium
-
-gclient metrics --opt-out
-
-fetch --nohooks chromium
-
-cd src
+# Update Chromium sources.
+mkdir chromium/src
+gclient sync --delete_unversioned_trees
+gclient runhooks
 
 mkdir -p out/Default
 export BUILD_DIR=$(readlink -f out/Default)
 
-echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> ../.gclient
-
-gclient sync
-
-gclient runhooks
 
 # Create a release, will be empty for now and incrementally populated
 # throughout the indexing pipeline.
@@ -128,4 +118,4 @@ index chromecast-linux 'target_os="linux" is_chromecast=true'
 
 cd /
 
-rm -rf clangd_indexing_tools* depot_tools chromium
+rm -rf clangd_indexing_tools*
