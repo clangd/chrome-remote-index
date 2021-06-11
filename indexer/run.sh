@@ -17,8 +17,6 @@ cd /
 # Prepare the environment: download all necessary binaries and fetch the source
 # code.
 
-echo "Downloading clangd indexer"
-
 export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
 
 export PATH="$PATH:$(readlink -f depot_tools)"
