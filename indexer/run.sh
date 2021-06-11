@@ -24,7 +24,7 @@ export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
 export PATH="$PATH:$(readlink -f depot_tools)"
 
 # Update Chromium sources.
-mkdir chromium/src
+cd chromium/src
 gclient sync --delete_unversioned_trees
 gclient runhooks
 
