@@ -12,6 +12,8 @@
 
 set -eux
 
+cd /
+
 # Prepare the environment: download all necessary binaries and fetch the source
 # code.
 
@@ -121,3 +123,9 @@ index chromecast-android 'target_os="android" is_chromecast=true'
 # --- Linux Chromecast ---
 
 index chromecast-linux 'target_os="linux" is_chromecast=true'
+
+# Clean up the filesystem.
+
+cd /
+
+rm -rf clangd_indexing_tools* depot_tools chromium

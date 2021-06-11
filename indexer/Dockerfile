@@ -24,7 +24,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install dependencies.
 RUN apt-get update; \
     apt-get install -y git curl sudo python3 python3-requests p7zip-full unzip \
-                       python libc6-i386 lsb-release gnupg \
+                       python libc6-i386 lsb-release gnupg cron \
                        software-properties-common; \
     apt-get dist-upgrade -y;
 
@@ -34,7 +34,12 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; \
     apt-get update; \
     apt-get install -y gh;
 
-COPY "download_latest_release_assets.py" "download_latest_release_assets.py"
-COPY "run.sh" "run.sh"
+COPY download_latest_release_assets.py download_latest_release_assets.py
+COPY run.sh run.sh
 
-ENTRYPOINT ["/run.sh"]
+COPY cronjob /etc/cron.d/cronjob
+RUN chmod 0644 etc/cron.d/cronjob
+RUN crontab /etc/cron.d/cronjob
+RUN touch /var/log/indexer.log
+
+ENTRYPOINT cron start && tail -f /var/log/indexer.log
