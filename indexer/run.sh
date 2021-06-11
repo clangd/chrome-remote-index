@@ -87,8 +87,8 @@ index() {
 
   gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$PLATFORM-$DATE.zip
 
-  # Clean up the build directory afterwards.
-  rm -rf $BUILD_DIR
+  # Clean up the artifacts.
+  rm -rf $BUILD_DIR /chrome-$PLATFORM.idx chrome-index-$PLATFORM-$DATE.zip
 }
 
 # --- Linux ---
