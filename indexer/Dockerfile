@@ -48,4 +48,6 @@ RUN unzip clangd_indexing_tools.zip && rm clangd_indexing_tools.zip
 COPY prepare.sh prepare.sh
 RUN chmod +x /prepare.sh
 
+RUN echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> /etc/environment
+
 ENTRYPOINT /prepare.sh && cron start && tail -f /var/log/indexer.log
