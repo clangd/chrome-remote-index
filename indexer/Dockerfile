@@ -24,7 +24,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install dependencies.
 RUN apt-get update; \
     apt-get install -y git curl sudo python3 python3-requests p7zip-full unzip \
-                       python libc6-i386 lsb-release gnupg \
+                       python libc6-i386 lsb-release gnupg cron \
                        software-properties-common; \
     apt-get dist-upgrade -y;
 
@@ -34,7 +34,20 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; \
     apt-get update; \
     apt-get install -y gh;
 
-COPY "download_latest_release_assets.py" "download_latest_release_assets.py"
-COPY "run.sh" "run.sh"
+COPY cronjob /etc/cron.d/cronjob
+RUN chmod 0644 etc/cron.d/cronjob
+RUN crontab /etc/cron.d/cronjob
+RUN touch /var/log/indexer.log
 
-ENTRYPOINT ["/run.sh"]
+COPY run.sh run.sh
+COPY download_latest_release_assets.py download_latest_release_assets.py
+
+RUN python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux
+RUN unzip clangd_indexing_tools.zip && rm clangd_indexing_tools.zip
+
+COPY prepare.sh prepare.sh
+RUN chmod +x /prepare.sh
+
+RUN echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> /etc/environment
+
+ENTRYPOINT /prepare.sh && cron start && tail -f /var/log/indexer.log
