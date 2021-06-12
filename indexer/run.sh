@@ -18,7 +18,7 @@ cd /
 # Prepare the environment: download all necessary binaries and fetch the source
 # code.
 
-export CLANGD_INDEXER=$(find . -name 'clangd-indexer' | xargs readlink -f)
+export CLANGD_INDEXER=$(find clangd_snapshot* -name "clangd-indexer" | xargs readlink -f)
 
 export PATH="$PATH:$(readlink -f depot_tools)"
 
@@ -41,10 +41,6 @@ COMMIT=$(git rev-parse --short HEAD)
 gh release create $COMMIT --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $COMMIT with project root \`$PWD\`."
-
-# Configurations for some build might fail but the indexing pipeline shouldn't
-# because some indices could still be produced.
-set +e
 
 # The indexing pipeline is common. Each platform will only have to do the
 # preparation step (set up the build configuration and install dependencies).
@@ -84,26 +80,26 @@ index() {
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-index linux 'target_os="linux"'
+index linux 'target_os="linux"' | true
 
 # --- ChromeOS ---
 
-index chromeos 'target_os="chromeos"'
+index chromeos 'target_os="chromeos"' | true
 
 # --- Android ---
 
 build/install-build-deps-android.sh
 
-index android 'target_os="android"'
+index android 'target_os="android"' | true
 
 # --- Fuchsia ---
 
-index fuchsia 'target_os="fuchsia"'
+index fuchsia 'target_os="fuchsia"' | true
 
 # --- Android Chromecast ---
 
-index chromecast-android 'target_os="android" is_chromecast=true'
+index chromecast-android 'target_os="android" is_chromecast=true' | true
 
 # --- Linux Chromecast ---
 
-index chromecast-linux 'target_os="linux" is_chromecast=true'
+index chromecast-linux 'target_os="linux" is_chromecast=true' | true
