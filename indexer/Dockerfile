@@ -43,7 +43,7 @@ COPY run.sh run.sh
 COPY download_latest_release_assets.py download_latest_release_assets.py
 
 RUN python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux && \
-    unzip -j clangd_indexing_tools.zip "*/bin/clangd-indexer" && \
+    unzip clangd_indexing_tools.zip && \
     rm clangd_indexing_tools.zip
 
 COPY prepare.sh prepare.sh
