@@ -18,7 +18,7 @@ cd /
 # Prepare the environment: download all necessary binaries and fetch the source
 # code.
 
-export CLANGD_INDEXER=$(find clangd_snapshot* -name "clangd-indexer" | xargs readlink -f)
+export CLANGD_INDEXER=$(readlink -f clangd-indexer)
 
 export PATH="$PATH:$(readlink -f depot_tools)"
 
@@ -80,26 +80,26 @@ index() {
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
 ./build/install-build-deps.sh
 
-index linux 'target_os="linux"' | true
+index linux 'target_os="linux"' || true
 
 # --- ChromeOS ---
 
-index chromeos 'target_os="chromeos"' | true
+index chromeos 'target_os="chromeos"' || true
 
 # --- Android ---
 
 build/install-build-deps-android.sh
 
-index android 'target_os="android"' | true
+index android 'target_os="android"' || true
 
 # --- Fuchsia ---
 
-index fuchsia 'target_os="fuchsia"' | true
+index fuchsia 'target_os="fuchsia"' || true
 
 # --- Android Chromecast ---
 
-index chromecast-android 'target_os="android" is_chromecast=true' | true
+index chromecast-android 'target_os="android" is_chromecast=true' || true
 
 # --- Linux Chromecast ---
 
-index chromecast-linux 'target_os="linux" is_chromecast=true' | true
+index chromecast-linux 'target_os="linux" is_chromecast=true' || true

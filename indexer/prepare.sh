@@ -15,7 +15,7 @@ set -eux
 
 cd /
 
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 
 export PATH="$PATH:$(readlink -f depot_tools)"
 

@@ -1,2 +1,1 @@
 30 11 * * * /run.sh >> /var/log/indexer.log 2>&1
-# Empty line.

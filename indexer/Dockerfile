@@ -42,8 +42,9 @@ RUN touch /var/log/indexer.log
 COPY run.sh run.sh
 COPY download_latest_release_assets.py download_latest_release_assets.py
 
-RUN python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux
-RUN unzip clangd_indexing_tools.zip && rm clangd_indexing_tools.zip
+RUN python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux && \
+    unzip -j clangd_indexing_tools.zip "*/bin/clangd-indexer" && \
+    rm clangd_indexing_tools.zip
 
 COPY prepare.sh prepare.sh
 RUN chmod +x /prepare.sh
