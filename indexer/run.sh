@@ -55,7 +55,7 @@ index() {
 
   echo "Indexing for $PLATFORM"
 
-  gn gen --args=$GN_ARGS $BUILD_DIR
+  gn gen --args="$GN_ARGS" $BUILD_DIR
 
   # Build generated files.
   ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
