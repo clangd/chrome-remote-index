@@ -51,4 +51,6 @@ RUN chmod +x /prepare.sh
 
 RUN echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> /etc/environment
 
-ENTRYPOINT /prepare.sh && cron start && tail -f /var/log/indexer.log
+ENTRYPOINT /prepare.sh >> /var/log/prepare.log 2>&1 && \
+           cron start && \
+           tail -f /var/log/indexer.log
