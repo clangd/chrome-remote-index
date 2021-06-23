@@ -25,8 +25,14 @@ BASE_INSTANCE_NAME="${PROJECT_ID}-server"
 # Which github repository to use for fetching index artifacts.
 INDEX_REPO="clangd/chrome-remote-index"
 
-# Prefix of the index file in the github release artifacts.
-INDEX_ASSET_PREFIX="chrome-index-linux"
+# Artifact prefix to fetch the index from and port number to serve it on.
+# Separated by `:`.
+INDEX_ASSET_PORT_PAIRS="chrome-index-linux:50051 \
+  chrome-index-chromeos:50052 \
+  chrome-index-android:50053 \
+  chrome-index-fuchsia:50054 \
+  chrome-index-chromecast-linux:50055 \
+  chrome-index-chromecast-android:50056"
 
 # Absolute path to project root on indexer machine, passed to
 # clangd-index-server.
