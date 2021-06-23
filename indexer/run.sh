@@ -24,6 +24,10 @@ export PATH="$PATH:$(readlink -f depot_tools)"
 
 # Update Chromium sources.
 cd chromium/src
+# Reset changes in package installation scripts.
+git reset --hard
+git pull
+gclient fetch
 gclient sync --delete_unversioned_trees
 gclient runhooks
 
