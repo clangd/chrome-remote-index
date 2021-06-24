@@ -21,7 +21,7 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # Install dependencies.
 RUN apt-get update; \
     apt-get install -y git curl python3 python3-requests p7zip-full unzip \
-                       cron lsb-release; \
+                       cron lsb-release sudo; \
     apt-get dist-upgrade -y;
 
 # Install GitHub CLI (needed for uploading to GitHub Releases).
