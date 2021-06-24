@@ -26,6 +26,7 @@ export PATH="$PATH:$(readlink -f depot_tools)"
 cd chromium/src
 # Reset changes in package installation scripts.
 git reset --hard
+git checkout main
 git pull
 gclient fetch
 gclient sync --delete_unversioned_trees

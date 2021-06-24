@@ -18,21 +18,15 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
       exit -1; \
     fi;
 
-ENV TZ=Europe/Berlin
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 # Install dependencies.
 RUN apt-get update; \
-    apt-get install -y git curl sudo python3 python3-requests p7zip-full unzip \
-                       python libc6-i386 lsb-release gnupg cron \
-                       software-properties-common; \
+    apt-get install -y git curl python3 python3-requests p7zip-full unzip \
+                       cron; \
     apt-get dist-upgrade -y;
 
 # Install GitHub CLI (needed for uploading to GitHub Releases).
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; \
-    apt-add-repository https://cli.github.com/packages; \
-    apt-get update; \
-    apt-get install -y gh;
+ADD https://github.com/cli/cli/releases/download/v1.11.0/gh_1.11.0_linux_amd64.deb gh.deb
+RUN dpkg -i gh.deb
 
 COPY cronjob /etc/cron.d/cronjob
 RUN chmod 0644 etc/cron.d/cronjob
