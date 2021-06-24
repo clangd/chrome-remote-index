@@ -13,8 +13,6 @@ FROM ubuntu:20.04
 ARG TOKEN
 ENV GITHUB_TOKEN=$TOKEN
 
-ARG DEBIAN_FRONTEND=noninteractive
-
 RUN if [ -z "$GITHUB_TOKEN" ]; then \
       echo "GITHUB_TOKEN should be provided during build stage."; \
       exit -1; \
@@ -22,9 +20,7 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 
 # Install dependencies.
 RUN apt-get update; \
-    apt-get install -y git curl sudo python3 \
-                       python3-requests p7zip-full unzip \
-                       python libc6-i386 lsb-release gnupg cron; \
+    apt-get install -y git python3 python3-requests p7zip-full unzip cron; \
     apt-get dist-upgrade -y;
 
 # Install GitHub CLI (needed for uploading to GitHub Releases).
