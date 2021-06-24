@@ -21,12 +21,12 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # Install dependencies.
 RUN apt-get update; \
     apt-get install -y git curl python3 python3-requests p7zip-full unzip \
-                       cron; \
+                       cron lsb-release; \
     apt-get dist-upgrade -y;
 
 # Install GitHub CLI (needed for uploading to GitHub Releases).
 ADD https://github.com/cli/cli/releases/download/v1.11.0/gh_1.11.0_linux_amd64.deb gh.deb
-RUN dpkg -i gh.deb
+RUN dpkg -i gh.deb && rm gh.deb
 
 COPY cronjob /etc/cron.d/cronjob
 RUN chmod 0644 etc/cron.d/cronjob
@@ -36,7 +36,8 @@ RUN touch /var/log/indexer.log
 COPY run.sh run.sh
 COPY download_latest_release_assets.py download_latest_release_assets.py
 
-RUN python3 download_latest_release_assets.py --output-name clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux && \
+RUN python3 download_latest_release_assets.py --output-name \
+      clangd_indexing_tools.zip --asset-prefix clangd_indexing_tools-linux && \
     unzip clangd_indexing_tools.zip && \
     rm clangd_indexing_tools.zip
 
