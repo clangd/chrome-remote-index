@@ -11,8 +11,8 @@ FROM ubuntu:20.04
 
 # GitHub Authentification token.
 ARG TOKEN
+ARG DEBIAN_FRONTEND=noninteractive
 ENV GITHUB_TOKEN=$TOKEN
-ENV DEBIAN_FRONTEND=noninteractive
 
 RUN if [ -z "$GITHUB_TOKEN" ]; then \
       echo "GITHUB_TOKEN should be provided during build stage."; \
