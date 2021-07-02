@@ -26,7 +26,7 @@ RUN apt-get update; \
     apt-get dist-upgrade -y;
 
 # Install GitHub CLI (needed for uploading to GitHub Releases).
-ADD https://github.com/cli/cli/releases/download/v1.11.0/gh_1.11.0_linux_amd64.deb gh.deb
+ADD https://github.com/cli/cli/releases/download/v1.12.1/gh_1.12.1_linux_amd64.deb gh.deb
 RUN dpkg -i gh.deb && rm gh.deb
 
 COPY cronjob /etc/cron.d/cronjob
