@@ -1,7 +1,7 @@
-# LLVM remote index server
+# Chromium remote index server
 
 This server provides about a day old index for
-[llvm-project](https://github.com/llvm/llvm-project/) to be used by
+[chromium](https://chromium.googlesource.com/chromium/src.git) to be used by
 clangd. It aims to lower resource usage of clangd on workstation machines by
 moving project-wide indexing and serving pieces to a centralized server.
 
@@ -21,7 +21,7 @@ After acquiring the binary, make sure your LSP client points to it. Details
 about this process can be found
 [here](https://clangd.llvm.org/installation.html#editor-plugins).
 
-## Pointing clangd to llvm-remote-index-server
+## Pointing clangd to chromium-remote-index-server
 
 Finally you'll need to point clangd at this particular index server. The easiest
 way to achieve this is via user configuration: a config.yaml file in an
@@ -34,16 +34,30 @@ OS-specific directory:
     `~/.config/clangd/config.yaml`.
 
 You'll need to populate this config file with the following, while changing
-`/path/to/llvm/` with absolute path to your checkout location.
+`/path/to/chromium/src/` with absolute path to your checkout location.
 
 ```
 If:
-  PathMatch: /path/to/llvm/.*
+  PathMatch: /path/to/chromium/src/.*
 Index:
   External:
-    Server: clangd-index.llvm.org:5900
-    MountPoint: /path/to/llvm/
+    Server: linux.clangd-index.chromium.org:5900
+    MountPoint: /path/to/chromium/src/
 ```
+
+If you are targeting a different platform, you can change the `Server` to one
+of the following instead:
+
+```
+linux: linux.clangd-index.chromium.org:5900
+chromeos: chromeos.clangd-index.chromium.org:5900
+android: android.clangd-index.chromium.org:5900
+fuchsia: fuchsia.clangd-index.chromium.org:5900
+chromecast-linux: chromecast-linux.clangd-index.chromium.org:5900
+chromecast-android: chromecast-android.clangd-index.chromium.org:5900
+```
+
+Unfortunately we don't support mac & windows targets yet.
 
 If you have multiple checkouts you can specify different fragments by putting
 `---` in between. You can also turn on local indexing for parts of the codebase
@@ -51,14 +65,14 @@ to have up-to-date symbol information. Such a config file could look like:
 
 ```
 If:
-  PathMatch: /path/to/llvm/.*
+  PathMatch: /path/to/chromium/src/.*
 Index:
   External:
-    Server: clangd-index.llvm.org:5900
-    MountPoint: /path/to/llvm/
+    Server: linux.clangd-index.chromium.org:5900
+    MountPoint: /path/to/chromium/src/
 ---
 If:
-  PathMatch: /path/to/llvm/clang-tools-extra/clangd/.*
+  PathMatch: /path/to/chromium/src/chromeos/login/.*
 Index:
   Background: Build
 ```
