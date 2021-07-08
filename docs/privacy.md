@@ -2,11 +2,11 @@
 
 ## Data pipeline
 
-Clangd remote index server is building an index directly from public LLVM
-[source code](https://github.com/llvm/llvm-project/). The [indexer
-code](https://github.com/clangd/llvm-remote-index/blob/master/.github/workflows/index.yaml)
-is executed by GitHub Actions and can be monitored on [clangd/llvm-remote-index
-Actions](https://github.com/clangd/llvm-remote-index/actions) tab. 
+Clangd remote index server is building an index directly from public Chromium
+[source code](https://chromium.googlesource.com/chromium/src.git). The
+[indexer code](https://github.com/clangd/llvm-remote-index/blob/master/.github/workflows/index.yaml)
+is executed on a GCP VM using
+[this docker container](https://github.com/clangd/chrome-remote-index/blob/main/indexer/Dockerfile).
 
 ## User data
 
@@ -28,11 +28,11 @@ sent and the only data it saves is:
 
 These logs help maintainers monitor and identify problems with the service and
 improve it over time. We [run the
-server](https://github.com/clangd/llvm-remote-index/blob/master/deployment/entry_point.sh)
+server](https://github.com/clangd/chrome-remote-index/blob/master/deployment/entry_point.sh)
 with `--log-public` option within a Docker
-[container](https://github.com/clangd/llvm-remote-index/blob/master/docker/Dockerfile).
+[container](https://github.com/clangd/chrome-remote-index/blob/master/docker/Dockerfile).
 All [deployment
-scripts](https://github.com/clangd/llvm-remote-index/tree/master/deployment)
+scripts](https://github.com/clangd/chrome-remote-index/tree/master/deployment)
 are also public.
 
 ## Client and server specification
@@ -40,8 +40,9 @@ are also public.
 Finally, the code that runs the service as well as its client side is publicly
 available. The client side implementation lives in upstream LLVM under
 [clang-tools-extra/clangd/index/remote/](https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd/index/remote),
-this is exactly the code being used to produce Clangd [releases and weekly
-snapshots](https://github.com/clangd/clangd/releases). The server code
-lives in [clangd/llvm-remote-index](https://github.com/clangd/llvm-remote-index)
+this is exactly the code being used to produce Clangd
+[releases and weekly snapshots](https://github.com/clangd/clangd/releases). The
+server code lives in
+[clangd/chrome-remote-index](https://github.com/clangd/chrome-remote-index)
 repository and also has the deployment scripts. The service is deployed on the
 public instance of Google Cloud Platform.
