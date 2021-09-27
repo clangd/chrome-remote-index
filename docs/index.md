@@ -13,7 +13,7 @@ More details on
 
 ## Getting clangd client
 
-** Googlers only ** : clangd is installed on `/usr/bin/clangd` by default on
+**Googlers only** : clangd is installed on `/usr/bin/clangd` by default on
 glinux workstations, you can directly use that instead.
 
 [clangd/releases](https://github.com/clangd/clangd/releases) are
@@ -26,7 +26,7 @@ about this process can be found
 
 ## Pointing clangd to chromium-remote-index-server
 
-** Googlers only ** : if you are using clangd installed on a glinux workstation,
+**Googlers only** : if you are using clangd installed on a glinux workstation,
 you should have remote-index support on by default.
 
 Finally you'll need to point clangd at this particular index server. The easiest
