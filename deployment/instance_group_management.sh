@@ -14,7 +14,7 @@ function updateIG() {
 function rolloutImage() {
   local IMAGE_FQN="$1"
   local TARGET="$2"
-  local IG_BASE="${BASE_INSTANCE_NAME}-ig-${TARGET}"
+  local IG_BASE="ig-${TARGET}"
   local SHORT_SHA=$(echo $IMAGE_FQN | cut -d: -f2 | head -c 8)
   local TEMPLATE_NAME="${BASE_TEMPLATE_NAME}-${SHORT_SHA}"
   bash create_vm_template.sh $IMAGE_FQN $TEMPLATE_NAME
