@@ -9,7 +9,7 @@ PROJECT_ID="chrome-remote-index"
 # 4 vCPUs and 32GB ram is enough for serving chrome-index for 6 different
 # platforms.
 # https://cloud.google.com/compute/docs/machine-types#e2_high-memory_machine_types
-MACHINE_TYPE="e2-highmem-4"
+MACHINE_TYPE="e2-custom-6-49152"
 DISK_SIZE="30GB"
 
 # Used as base name for instance groups and machine instances.
