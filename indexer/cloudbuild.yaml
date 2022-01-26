@@ -1,0 +1,13 @@
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - >-
+        cd indexer &&
+        bash rollout_new_release.sh $$GH_TOKEN
+    secretEnv: ['GH_TOKEN']
+availableSecrets:
+  secretManager:
+    - versionName: projects/chrome-remote-index/secrets/GH_TOKEN/versions/latest
+      env: GH_TOKEN
