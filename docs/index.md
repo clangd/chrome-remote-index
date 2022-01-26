@@ -16,8 +16,9 @@ More details on
 **Googlers only** : clangd is installed on `/usr/bin/clangd` by default on
 glinux workstations, you can directly use that instead.
 
-[clangd/releases](https://github.com/clangd/clangd/releases) are
-built with that support for major platforms. You can find out about other
+Remote index support requires **clangd 12** or newer, and is not yet included
+in default builds. [clangd/releases](https://github.com/clangd/clangd/releases)
+are built with that support for major platforms. You can find out about other
 options in [here](https://clangd.llvm.org/remote-index.html#clangd-client).
 
 After acquiring the binary, make sure your LSP client points to it. Details
@@ -137,6 +138,16 @@ V[12:49:24.662] Remote index connection [linux.clangd-index.chromium.org:5900]: 
 Note that to see the verbose logs you need to pass in `-log=verbose` to clangd.
 You can find details about accessing clangd logs in
 https://clangd.llvm.org/troubleshooting.html#gathering-logs.
+
+### Unknown key config warning
+
+If you have the following warning:
+
+> I[00:00:00.000] config warning at /path/to/.config/clangd/config.yaml:5:2:
+> Unknown Index key External
+
+It means your version of clangd is too old or was not built with remote index
+support. See [Getting clangd client](#getting-clangd-client) for more details.
 
 ### Untrusted config warning
 
