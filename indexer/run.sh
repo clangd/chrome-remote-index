@@ -40,10 +40,9 @@ export BUILD_DIR=$(readlink -f out/Default)
 # throughout the indexing pipeline.
 
 DATE=$(date -u +%Y%m%d)
-
 COMMIT=$(git rev-parse --short HEAD)
-
-gh release create $COMMIT --repo clangd/chrome-remote-index \
+RELEASE_NAME="index/${DATE}"
+gh release create $RELEASE_NAME --repo clangd/chrome-remote-index \
   --title="Index at $DATE" \
   --notes="Chromium index artifacts at $COMMIT with project root \`$PWD\`."
 
@@ -72,7 +71,7 @@ index() {
 
   7z a chrome-index-$PLATFORM-$DATE.zip /chrome-$PLATFORM.idx
 
-  gh release upload --repo clangd/chrome-remote-index $COMMIT chrome-index-$PLATFORM-$DATE.zip
+  gh release upload --repo clangd/chrome-remote-index $RELEASE_NAME chrome-index-$PLATFORM-$DATE.zip
 
   # Clean up the artifacts.
   rm -rf $BUILD_DIR /chrome-$PLATFORM.idx chrome-index-$PLATFORM-$DATE.zip
