@@ -15,29 +15,28 @@ set -eux
 
 cd /
 
+rm -rf depot_tools
 git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 
 export PATH="$PATH:$(readlink -f depot_tools)"
 
-mkdir chromium
+mkdir -p chromium
 cd chromium
 
 gclient metrics --opt-out
 
-fetch --nohooks chromium
+fetch --no-history --nohooks chromium
 
 echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> .gclient
 
 cd src
 
-gclient sync
+gclient sync --no-history
 
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
-./build/install-build-deps.sh
-
-build/install-build-deps-android.sh
+build/install-build-deps-android.sh || true
 
 gclient runhooks
 

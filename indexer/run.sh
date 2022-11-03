@@ -24,17 +24,14 @@ export PATH="$PATH:$(readlink -f depot_tools)"
 
 # Update Chromium sources.
 cd chromium/src
-# Reset changes in package installation scripts.
-git reset --hard
-git checkout main
-git pull
+git fetch --depth=1
+git reset --hard origin/main
 gclient fetch
-gclient sync --delete_unversioned_trees
+gclient sync --no-history --delete_unversioned_trees
 gclient runhooks
 
 mkdir -p out/Default
 export BUILD_DIR=$(readlink -f out/Default)
-
 
 # Create a release, will be empty for now and incrementally populated
 # throughout the indexing pipeline.
@@ -58,6 +55,8 @@ index() {
   GN_ARGS=$2
 
   echo "Indexing for $PLATFORM"
+  # Clean up the artifacts.
+  rm -rf $BUILD_DIR /chrome-*.idx chrome-index-*.zip
 
   gn gen --args="$GN_ARGS" $BUILD_DIR
 
@@ -72,9 +71,6 @@ index() {
   7z a chrome-index-$PLATFORM-$DATE.zip /chrome-$PLATFORM.idx
 
   gh release upload --repo clangd/chrome-remote-index $RELEASE_NAME chrome-index-$PLATFORM-$DATE.zip
-
-  # Clean up the artifacts.
-  rm -rf $BUILD_DIR /chrome-$PLATFORM.idx chrome-index-$PLATFORM-$DATE.zip
 }
 
 # --- Linux ---
@@ -82,7 +78,7 @@ index() {
 # Remove snapcraft from dependency list: installing it is not feasible inside
 # Docker.
 sed -i '/if package_exists snapcraft/,/fi/d' ./build/install-build-deps.sh
-./build/install-build-deps.sh
+./build/install-build-deps.sh || true
 
 index linux 'target_os="linux"' || true
 
@@ -92,7 +88,7 @@ index chromeos 'target_os="chromeos"' || true
 
 # --- Android ---
 
-build/install-build-deps-android.sh
+build/install-build-deps-android.sh || true
 
 index android 'target_os="android"' || true
 
