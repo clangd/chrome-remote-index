@@ -71,6 +71,7 @@ index() {
   7z a chrome-index-$PLATFORM-$DATE.zip /chrome-$PLATFORM.idx
 
   gh release upload --repo clangd/chrome-remote-index $RELEASE_NAME chrome-index-$PLATFORM-$DATE.zip
+  echo "Finished indexing for $PLATFORM"
 }
 
 # --- Linux ---
