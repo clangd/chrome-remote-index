@@ -61,7 +61,7 @@ index() {
   gn gen --args="$GN_ARGS" $BUILD_DIR
 
   # Build generated files.
-  ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR
+  ninja -C $BUILD_DIR -t targets all | grep -i '^gen/' | grep -E "\.(cpp|h|inc|cc)\:" | cut -d':' -f1 | xargs autoninja -C $BUILD_DIR -k 0
 
   # Get compile_commands.json for clangd-indexer.
   tools/clang/scripts/generate_compdb.py -p $BUILD_DIR > compile_commands.json
