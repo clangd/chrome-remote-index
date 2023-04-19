@@ -25,7 +25,11 @@ cd chromium
 
 gclient metrics --opt-out
 
-fetch --no-history --nohooks chromium
+# Perform fetch only if this is for the first time. As fetch will fail
+# otherwise.
+if [ ! -f .gclient ]; then
+  fetch --no-history --nohooks chromium
+fi
 
 echo "target_os = [ 'linux', 'android', 'chromeos', 'fuchsia' ]" >> .gclient
 
