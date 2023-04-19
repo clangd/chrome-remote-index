@@ -15,6 +15,9 @@ set -eux
 
 /prepare.sh
 
-cron
+# Run one indexing cycle immediately at startup.
+/run.sh
 
+# Start cron only after initial indexing finishes.
+cron
 tail -f /var/log/indexer.log
