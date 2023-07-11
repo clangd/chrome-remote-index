@@ -57,6 +57,7 @@ If:
   PathMatch: /path/to/chromium/src/.*
 Index:
   External:
+    # Change this depending on the platform, see below.
     Server: linux.clangd-index.chromium.org:5900
     MountPoint: /path/to/chromium/src/
 ```
@@ -77,7 +78,7 @@ chromecast-linux: chromecast-linux.clangd-index.chromium.org:5900
 chromecast-android: chromecast-android.clangd-index.chromium.org:5900
 ```
 
-Unfortunately we don't support mac & windows targets yet.
+Unfortunately we don't support iOS, mac & windows targets yet.
 
 ### Will clangd still know about my local changes?
 
