@@ -168,7 +168,7 @@ If you have the following warning:
 
 It means you configered the remote index through project config (e.g.
 `/path/to/llvm/.clangd`) which is no longer supported. Please follow
-[configuration instructions](http://go/clangd-llvm-remote-index#setup-instructions-for-googlers)
+[configuration instructions](#pointing-clangd-to-chromium-remote-index-server)
 above instead.
 
 ### Symbol information seems to be missing for some symbols.
