@@ -37,10 +37,7 @@ cd src
 
 gclient sync --no-history
 
-# Remove snapcraft from dependency list: installing it is not feasible inside
-# Docker.
-sed -i '/if package_exists("snapcraft"):/,/packages.append("snapcraft")/d' ./build/install-build-deps.py
-build/install-build-deps-android.sh || true
+build/install-build-deps.py || true
 
 gclient runhooks
 
