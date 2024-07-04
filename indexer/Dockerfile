@@ -11,7 +11,7 @@ FROM ubuntu:20.04
 
 # GitHub Authentification token.
 ARG TOKEN
-ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 ENV GITHUB_TOKEN=$TOKEN
 
 RUN if [ -z "$GITHUB_TOKEN" ]; then \
@@ -46,6 +46,7 @@ COPY prepare.sh prepare.sh
 RUN chmod +x /prepare.sh
 
 RUN echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> /etc/environment
+RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 
 COPY entry_point.sh entry_point.sh
 RUN chmod +x /entry_point.sh
