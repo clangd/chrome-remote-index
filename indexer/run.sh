@@ -76,10 +76,7 @@ index() {
 
 # --- Linux ---
 
-# Remove snapcraft from dependency list: installing it is not feasible inside
-# Docker.
-sed -i '/if package_exists("snapcraft"):/,/packages.append("snapcraft")/d' ./build/install-build-deps.py
-./build/install-build-deps.sh || true
+./build/install-build-deps.py || true
 
 index linux 'target_os="linux"' || true
 
@@ -88,8 +85,6 @@ index linux 'target_os="linux"' || true
 index chromeos 'target_os="chromeos"' || true
 
 # --- Android ---
-
-build/install-build-deps-android.sh || true
 
 index android 'target_os="android"' || true
 
