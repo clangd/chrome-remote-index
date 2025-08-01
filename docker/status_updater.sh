@@ -8,7 +8,7 @@ SUCCESS_TMPL="$TMPL_DIR/success"
 FAILURE_TMPL="$TMPL_DIR/failure"
 CONTACT_TMPL="$TMPL_DIR/contact"
 FOOTER_TMPL="$TMPL_DIR/footer"
-OUT_FILE="/var/www/html/status.html"
+OUT_FILE="/usr/share/nginx/html/status.html"
 
 if [[ $# -lt 2 ]]; then
   echo "Usage: $0 PROJECT_NAME REPOSITORY PORTS..."

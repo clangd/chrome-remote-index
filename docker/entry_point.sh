@@ -10,9 +10,9 @@ set -x
 STATUS_UPDATER_CMD="/status_updater.sh $PROJECT_NAME $REPOSITORY"
 
 # Move static files to serving directory.
-cp -r docs/* /var/www/html/
+cp -r docs/* /usr/share/nginx/html/
 
-# Start the nginx server. Contents in /var/www/html are served at *:80.
+# Start the nginx server. Contents in /usr/share/nginx/html are served at *:80.
 service nginx start
 
 # Set the path so that cron can find j2.

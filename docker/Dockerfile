@@ -13,7 +13,7 @@ RUN apt-get update -y && apt-get install -y nginx
 RUN apt-get install -y --no-install-recommends python3-pip && \
   pip3 install --break-system-packages j2cli && apt-get remove -y python3-pip \
   && apt-get autoremove -y
-RUN rm -rf /var/www/html/*
+RUN rm -rf /usr/share/nginx/html/*
 WORKDIR "/"
 
 ARG REPOSITORY
