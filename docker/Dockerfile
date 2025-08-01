@@ -1,6 +1,13 @@
 FROM debian:stable
 RUN apt-get update -y && apt-get upgrade -y
-RUN apt-get install -y cron python3 python3-requests unzip nginx-light
+RUN apt-get install -y cron python3 python3-requests unzip gpg curl lsb-release
+# Install a recent version of nginx for security patches.
+RUN curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > \
+  /usr/share/keyrings/nginx-archive-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+http://nginx.org/packages/debian `lsb_release -cs` nginx" > \
+  /etc/apt/sources.list.d/nginx.list
+RUN apt-get update -y && apt-get install -y nginx
 # We install pip, jinja and delete pip afterwards in same step to keep final
 # image size small.
 RUN apt-get install -y --no-install-recommends python3-pip && \
