@@ -24,5 +24,4 @@ cd "$TEMP_DIR"
 
 # Build the image, tag it for GCR and push.
 docker build --build-arg TOKEN="$TOKEN" -t "$IMAGE_IN_GCR" .
-gcloud auth configure-docker
 docker push "$IMAGE_IN_GCR"

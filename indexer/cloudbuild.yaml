@@ -1,13 +1,19 @@
 steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - >-
+        cd indexer &&
+        bash push_new_docker_image.sh $$GH_TOKEN
+    secretEnv: ['GH_TOKEN']
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: 'bash'
     args:
       - '-c'
       - >-
-        apt-get install -y docker &&
         cd indexer &&
         bash rollout_new_release.sh $$GH_TOKEN
-    secretEnv: ['GH_TOKEN']
 availableSecrets:
   secretManager:
     - versionName: projects/chrome-remote-index/secrets/GH_TOKEN/versions/latest
