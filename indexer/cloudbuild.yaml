@@ -4,7 +4,7 @@ steps:
     args:
       - '-c'
       - >-
-        apt-get install docker &&
+        apt-get install -y docker &&
         cd indexer &&
         bash rollout_new_release.sh $$GH_TOKEN
     secretEnv: ['GH_TOKEN']
