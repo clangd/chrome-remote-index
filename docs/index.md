@@ -1,3 +1,6 @@
+> [!CAUTION]
+> # Central chrome remote index server has been turned down. It's no longer possible to use it.
+
 # Chromium remote index server
 
 This server provides about a day old index for
